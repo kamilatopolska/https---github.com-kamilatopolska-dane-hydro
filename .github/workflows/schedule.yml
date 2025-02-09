@@ -11,14 +11,15 @@ on:
     - cron: '0 22 * * *'
   # Dla testów możesz dodać także ręczne uruchamianie:
   workflow_dispatch:
+
 jobs:
   run-data-fetch:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repozytorium
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-            fetch-depth: 0  # Pełna historia, potrzebna do commitowania
+          fetch-depth: 0  # Pełna historia
 
       - name: Ustawienie środowiska Python
         uses: actions/setup-python@v4
@@ -33,29 +34,42 @@ jobs:
       - name: Uruchomienie skryptu
         run: python main.py
 
-      - name: Przeniesienie CSV do folderu 'data' i commit do gałęzi data-archive
+      - name: Przeniesienie CSV do folderu 'data'
         run: |
-          # Utwórz folder 'data' jeśli nie istnieje
           mkdir -p data
-          # Przenieś wszystkie pliki CSV do folderu 'data'
           mv stacja_*.csv data/ || echo "Brak plików CSV do przeniesienia"
+
+      - name: Konfiguracja GIT
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Pobranie i przełączenie na gałąź 'data-archive'
+        run: |
+          # Pobranie wszystkich gałęzi
+          git fetch --all
           
-          # Skonfiguruj dane użytkownika dla commitu
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          
-          # Przełącz się (lub utwórz) gałąź data-archive
-          git checkout -B data-archive          
-          # Dodaj pliki z folderu 'data'
+          # Sprawdzenie, czy gałąź istnieje na GitHubie
+          if git show-ref --quiet refs/remotes/origin/data-archive; then
+            echo "Gałąź data-archive istnieje, przełączam się na nią."
+            git checkout data-archive
+          else
+            echo "Gałąź data-archive nie istnieje, tworzę nową."
+            git checkout -b data-archive
+            git push origin data-archive  # Utworzenie nowej gałęzi na GitHubie
+          fi
+
+      - name: Commit i push zmian do 'data-archive'
+        run: |
           git add data/
           
-          # Jeśli są zmiany, commituj i pushuj
-          if ! git diff-index --quiet HEAD --; then
-            git commit -m "Dodanie plików CSV: $(date +'%Y-%m-%d %H:%M:%S')"
-            git push origin data-archive
-          else
-            echo "Brak nowych zmian do commitowania"
+          if git diff --staged --quiet; then
+            echo "Brak nowych zmian do commitowania."
+            exit 0
           fi
+          
+          git commit -m "Dodanie plików CSV: $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin data-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
