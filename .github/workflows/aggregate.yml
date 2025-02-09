@@ -16,8 +16,9 @@ jobs:
 
       - name: Pobierz branch `data-archive`
         run: |
-          git fetch origin
-          git checkout origin/data-archive
+          git fetch origin data-archive
+          git checkout origin/data-archive -- data
+          git checkout origin/main -- aggregate.py
 
       - name: Sprawdzenie zawartości katalogu
         run: ls -R
