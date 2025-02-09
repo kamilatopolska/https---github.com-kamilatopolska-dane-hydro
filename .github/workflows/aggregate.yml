@@ -9,10 +9,17 @@ jobs:
   aggregate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout gałęzi data-archive
+      - name: Pobierz repozytorium
         uses: actions/checkout@v4
-        with:
-          ref: data-archive
+
+      - name: Sprawdzenie zawartości katalogu
+        run: ls -R
+
+      - name: Nadanie uprawnień do skryptu
+        run: chmod +x aggregate.py
+
+      - name: Uruchom agregację danych
+        run: python aggregate.py
 
       - name: Ustawienie środowiska Python
         uses: actions/setup-python@v4
