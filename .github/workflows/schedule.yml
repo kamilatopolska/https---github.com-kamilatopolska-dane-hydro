@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repozytorium
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Konieczne, aby mieć pełną historię i móc commitować
 
       - name: Ustawienie środowiska Python
         uses: actions/setup-python@v4
@@ -32,9 +34,34 @@ jobs:
       - name: Uruchomienie skryptu
         run: python main.py
 
-      - name: Zapis plików CSV jako artefakt
+      - name: Przeniesienie CSV do folderu 'data' i commit do gałęzi data-archive
+        run: |
+          # Utwórz folder 'data' jeśli nie istnieje
+          mkdir -p data
+          # Przenieś wszystkie pliki CSV do folderu 'data'
+          mv stacja_*.csv data/ || echo "Brak plików CSV do przeniesienia"
+          
+          # Skonfiguruj dane użytkownika dla commitu
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Dodaj pliki z folderu 'data'
+          git add data/
+          
+          # Sprawdź, czy są zmiany do zatwierdzenia
+          if ! git diff-index --quiet HEAD --; then
+            # Commituj zmiany
+            git commit -m "Dodanie plików CSV: $(date +'%Y-%m-%d %H:%M:%S')"
+            # Pushuj do gałęzi data-archive (jeśli gałąź nie istnieje, zostanie utworzona)
+            git push origin HEAD:data-archive
+          else
+            echo "Brak nowych zmian do commitowania"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload plików CSV jako artefakt
         uses: actions/upload-artifact@v4
         with:
           name: csv-data
-          # nazwy plików zaczynają się od "stacja_"
-          path: stacja_*.csv
+          path: data/*.csv
