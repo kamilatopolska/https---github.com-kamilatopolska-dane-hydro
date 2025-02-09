@@ -2,8 +2,6 @@ import requests
 import logging
 import csv
 from datetime import datetime
-import schedule
-import time
 
 # Konfiguracja logowania
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -52,13 +50,13 @@ def zapisz_do_csv(dane):
         logging.warning("Brak danych do zapisania.")
         return
 
-    # Ustal nazwę pliku z aktualną datą i godziną
+    # Ustala nazwę pliku z aktualną datą i godziną
     teraz = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     nazwa_pliku = f"stacja_{STATION_ID}_{teraz}.csv"
 
     try:
         with open(nazwa_pliku, mode='w', encoding='utf-8', newline='') as csvfile:
-            # Ustal nagłówki kolumn na podstawie kluczy słownika
+            # Ustala nagłówki kolumn na podstawie kluczy słownika
             fieldnames = list(dane.keys())
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -76,16 +74,6 @@ def zadanie():
     stacja_dane = filtruj_dane(wszystkie_dane, STATION_ID)
     zapisz_do_csv(stacja_dane)
 
-# Konfiguracja harmonogramu: uruchom zadanie o 06:00, 14:00 i 22:00 każdego dnia
-schedule.every().day.at("06:00").do(zadanie)
-schedule.every().day.at("14:00").do(zadanie)
-schedule.every().day.at("22:00").do(zadanie)
-
-# if __name__ == '__main__':
-#     # Test jednorazowego uruchomienia zadania (opcjonalne)
-#     zadanie()
-
-logging.info("Uruchamianie harmonogramu zadań...")
-while True:
-    schedule.run_pending()
-    time.sleep(30)  # Sprawdzaj co 30 sekund, czy nadszedł czas uruchomienia zadania
+if __name__ == '__main__':
+    # Jednorazowe uruchomienia zadania
+    zadanie()
