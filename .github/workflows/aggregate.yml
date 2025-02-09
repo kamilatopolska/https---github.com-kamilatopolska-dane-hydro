@@ -12,8 +12,10 @@ jobs:
       - name: Pobierz repozytorium
         uses: actions/checkout@v4
 
-      - name: Sprawdzenie zawartości katalogu
-        run: ls -R
+      - name: Pobierz dane z `data-archive`
+        run: |
+          git fetch origin data-archive
+          git checkout data-archive -- data
 
       - name: Zainstaluj pandas
         run: pip install pandas
