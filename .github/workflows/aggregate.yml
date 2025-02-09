@@ -11,34 +11,19 @@ jobs:
     steps:
       - name: Pobierz repozytorium
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Pobiera całe repozytorium
 
-      - name: Pobierz dane z `data-archive`
+      - name: Pobierz branch `data-archive`
         run: |
-          git fetch origin data-archive
-          git checkout data-archive -- data
+          git fetch origin
+          git checkout origin/data-archive
+
+      - name: Sprawdzenie zawartości katalogu
+        run: ls -R
 
       - name: Zainstaluj pandas
         run: pip install pandas
 
-      - name: Nadanie uprawnień do skryptu
-        run: chmod +x aggregate.py
-
       - name: Uruchom agregację danych
         run: python aggregate.py
-
-      - name: Ustawienie środowiska Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Instalacja zależności
-        run: pip install pandas
-
-      - name: Uruchomienie skryptu agregującego
-        run: python aggregate.py
-
-      - name: Upload zbiorczego pliku jako artefakt
-        uses: actions/upload-artifact@v4
-        with:
-          name: aggregated-csv
-          path: aggregated_*.csv
