@@ -15,6 +15,9 @@ jobs:
       - name: Sprawdzenie zawartości katalogu
         run: ls -R
 
+      - name: Zainstaluj pandas
+        run: pip install pandas
+
       - name: Nadanie uprawnień do skryptu
         run: chmod +x aggregate.py
 
