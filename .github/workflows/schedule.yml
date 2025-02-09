@@ -1,0 +1,40 @@
+name: Scheduled Data Fetch
+
+on:
+  schedule:
+    # GitHub Actions używa strefy czasowej UTC.
+    # Jeśli chcesz np. aby zadanie uruchamiało się o 06:00, 14:00 i 22:00 czasu lokalnego,
+    # przelicz te godziny na UTC.
+    # Przykładowo, jeśli jesteś w strefie UTC+0, to harmonogram może wyglądać tak:
+    - cron: '0 6 * * *'
+    - cron: '0 14 * * *'
+    - cron: '0 22 * * *'
+  # Dla testów możesz dodać także ręczne uruchamianie:
+  workflow_dispatch:
+
+jobs:
+  run-data-fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repozytorium
+        uses: actions/checkout@v3
+
+      - name: Ustawienie środowiska Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Instalacja zależności
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests schedule
+
+      - name: Uruchomienie skryptu
+        run: python main.py
+
+      - name: Zapis plików CSV jako artefakt
+        uses: actions/upload-artifact@v3
+        with:
+          name: csv-data
+          # nazwy plików zaczynają się od "stacja_"
+          path: stacja_*.csv
