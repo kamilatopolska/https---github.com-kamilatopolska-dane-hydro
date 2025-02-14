@@ -6,17 +6,26 @@ from datetime import datetime
 # Konfiguracja logowania
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Adres endpointu API
-API_URL = "http://danepubliczne.imgw.pl/api/data/hydro/"
-# Identyfikator stacji, dla której chcemy pobrać dane
-STATION_ID = "153140010"
+# Adresy endpointów API
+API_URLS = {
+    "hydro1": "http://danepubliczne.imgw.pl/api/data/hydro/",
+    "hydro2": "http://danepubliczne.imgw.pl/api/data/hydro2/",
+    "meteo": "http://danepubliczne.imgw.pl/api/data/meteo/"
+}
 
-def pobierz_dane():
+# Identyfikatory stacji
+STATION_IDS = {
+    "hydro1": "153140010",
+    "hydro2": "153140010",
+    "meteo": "353140200"
+}
+
+def pobierz_dane(api_url):
     """
-    Pobiera dane z API (wszystkie stacje) i zwraca je jako listę słowników.
+    Pobiera dane z API i zwraca je jako listę słowników.
     """
     try:
-        response = requests.get(API_URL)
+        response = requests.get(api_url)
         logging.info(f"Status code: {response.status_code}")
         response.raise_for_status()  # Upewnij się, że odpowiedź ma status 200 OK
         dane = response.json()
@@ -35,13 +44,13 @@ def filtruj_dane(dane, station_id):
         return None
 
     for rekord in dane:
-        if rekord.get("id_stacji") == station_id:
+        if rekord.get("kod_stacji") == station_id:
             return rekord
 
     logging.warning(f"Nie znaleziono danych dla stacji {station_id}.")
     return None
 
-def zapisz_do_csv(dane):
+def zapisz_do_csv(dane, station_id, prefix):
     """
     Zapisuje dane (słownik) do pliku CSV.
     Nazwa pliku zawiera identyfikator stacji oraz aktualną datę i godzinę.
@@ -52,7 +61,7 @@ def zapisz_do_csv(dane):
 
     # Ustala nazwę pliku z aktualną datą i godziną
     teraz = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    nazwa_pliku = f"stacja_{STATION_ID}_{teraz}.csv"
+    nazwa_pliku = f"{prefix}_stacja_{station_id}_{teraz}.csv"
 
     try:
         with open(nazwa_pliku, mode='w', encoding='utf-8', newline='') as csvfile:
@@ -67,12 +76,24 @@ def zapisz_do_csv(dane):
 
 def zadanie():
     """
-    Główna funkcja: pobiera dane, filtruje rekord dla wybranej stacji i zapisuje je do CSV.
+    Główna funkcja: pobiera dane, filtruje rekordy dla wybranych stacji i zapisuje je do CSV.
     """
     logging.info("Rozpoczynam pobieranie i zapis danych...")
-    wszystkie_dane = pobierz_dane()
-    stacja_dane = filtruj_dane(wszystkie_dane, STATION_ID)
-    zapisz_do_csv(stacja_dane)
+
+    # Pobierz i zapisz dane dla hydro1
+    dane_hydro1 = pobierz_dane(API_URLS["hydro1"])
+    stacja_dane_hydro1 = filtruj_dane(dane_hydro1, STATION_IDS["hydro1"])
+    zapisz_do_csv(stacja_dane_hydro1, STATION_IDS["hydro1"], "hydro1")
+
+    # Pobierz i zapisz dane dla hydro2
+    dane_hydro2 = pobierz_dane(API_URLS["hydro2"])
+    stacja_dane_hydro2 = filtruj_dane(dane_hydro2, STATION_IDS["hydro2"])
+    zapisz_do_csv(stacja_dane_hydro2, STATION_IDS["hydro2"], "hydro2")
+
+    # Pobierz i zapisz dane dla meteo
+    dane_meteo = pobierz_dane(API_URLS["meteo"])
+    stacja_dane_meteo = filtruj_dane(dane_meteo, STATION_IDS["meteo"])
+    zapisz_do_csv(stacja_dane_meteo, STATION_IDS["meteo"], "meteo")
 
 if __name__ == '__main__':
     # Jednorazowe uruchomienia zadania

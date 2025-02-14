@@ -29,7 +29,7 @@ jobs:
       - name: Instalacja zależności
         run: |
           python -m pip install --upgrade pip
-          pip install requests schedule
+          pip install requests
 
       - name: Uruchomienie skryptu
         run: python main.py
@@ -37,7 +37,9 @@ jobs:
       - name: Przeniesienie CSV do folderu 'data'
         run: |
           mkdir -p data
-          mv stacja_*.csv data/ || echo "Brak plików CSV do przeniesienia"
+          mv hydro1_stacja_*.csv data/ || echo "Brak plików CSV do przeniesienia"
+          mv hydro2_stacja_*.csv data/ || echo "Brak plików CSV do przeniesienia"
+          mv meteo_stacja_*.csv data/ || echo "Brak plików CSV do przeniesienia"
 
       - name: Konfiguracja GIT
         run: |

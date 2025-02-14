@@ -19,25 +19,33 @@ def file_in_previous_month(filename):
     try:
         # Rozdziel nazwę pliku po znaku '_' i pobierz trzeci element
         parts = filename.split('_')
-        if len(parts) < 3:
+        if len(parts) < 4:
             return False
-        date_part = parts[2]  # oczekujemy formatu YYYY-MM-DD
+        date_part = parts[3]  # oczekujemy formatu YYYY-MM-DD
         file_date = datetime.strptime(date_part, '%Y-%m-%d')
         return file_date.year == year and file_date.month == month
     except Exception as e:
         return False
 
-files_to_aggregate = [os.path.join(folder, f) for f in csv_files if file_in_previous_month(f)]
+# Filtruj pliki dla każdego źródła
+files_to_aggregate_hydro1 = [os.path.join(folder, f) for f in csv_files if f.startswith('hydro1') and file_in_previous_month(f)]
+files_to_aggregate_hydro2 = [os.path.join(folder, f) for f in csv_files if f.startswith('hydro2') and file_in_previous_month(f)]
+files_to_aggregate_meteo = [os.path.join(folder, f) for f in csv_files if f.startswith('meteo') and file_in_previous_month(f)]
 
-if not files_to_aggregate:
-    print("Nie znaleziono plików CSV dla poprzedniego miesiąca.")
-    exit(0)
+def aggregate_files(files_to_aggregate, output_filename):
+    if not files_to_aggregate:
+        print(f"Nie znaleziono plików CSV dla poprzedniego miesiąca dla {output_filename}.")
+        return
 
-# Wczytanie i połączenie danych
-df_list = [pd.read_csv(file) for file in files_to_aggregate]
-df_aggregated = pd.concat(df_list, ignore_index=True)
+    # Wczytanie i połączenie danych
+    df_list = [pd.read_csv(file) for file in files_to_aggregate]
+    df_aggregated = pd.concat(df_list, ignore_index=True)
 
-# Zapisanie zbiorczego pliku
-output_filename = f'aggregated_{year}_{month:02d}.csv'
-df_aggregated.to_csv(output_filename, index=False)
-print(f"Zbiorczy plik CSV zapisany jako {output_filename}")
+    # Zapisanie zbiorczego pliku
+    df_aggregated.to_csv(output_filename, index=False)
+    print(f"Zbiorczy plik CSV zapisany jako {output_filename}")
+
+# Agreguj pliki dla każdego źródła
+aggregate_files(files_to_aggregate_hydro1, f'aggregated_hydro1_{year}_{month:02d}.csv')
+aggregate_files(files_to_aggregate_hydro2, f'aggregated_hydro2_{year}_{month:02d}.csv')
+aggregate_files(files_to_aggregate_meteo, f'aggregated_meteo_{year}_{month:02d}.csv')
