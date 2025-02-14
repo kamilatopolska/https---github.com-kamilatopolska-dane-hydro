@@ -35,7 +35,7 @@ def pobierz_dane(api_url):
         logging.error(f"Błąd pobierania danych: {e}")
         return None
 
-def filtruj_dane(dane, station_id):
+def filtruj_dane(dane, station_id, key):
     """
     Filtruje listę rekordów i zwraca rekord odpowiadający podanemu identyfikatorowi stacji.
     Jeśli rekord nie zostanie znaleziony, zwraca None.
@@ -44,7 +44,7 @@ def filtruj_dane(dane, station_id):
         return None
 
     for rekord in dane:
-        if rekord.get("kod_stacji") == station_id:
+        if rekord.get(key) == station_id:
             return rekord
 
     logging.warning(f"Nie znaleziono danych dla stacji {station_id}.")
@@ -82,17 +82,17 @@ def zadanie():
 
     # Pobierz i zapisz dane dla hydro1
     dane_hydro1 = pobierz_dane(API_URLS["hydro1"])
-    stacja_dane_hydro1 = filtruj_dane(dane_hydro1, STATION_IDS["hydro1"])
+    stacja_dane_hydro1 = filtruj_dane(dane_hydro1, STATION_IDS["hydro1"], "id_stacji")
     zapisz_do_csv(stacja_dane_hydro1, STATION_IDS["hydro1"], "hydro1")
 
     # Pobierz i zapisz dane dla hydro2
     dane_hydro2 = pobierz_dane(API_URLS["hydro2"])
-    stacja_dane_hydro2 = filtruj_dane(dane_hydro2, STATION_IDS["hydro2"])
+    stacja_dane_hydro2 = filtruj_dane(dane_hydro2, STATION_IDS["hydro2"], "kod_stacji")
     zapisz_do_csv(stacja_dane_hydro2, STATION_IDS["hydro2"], "hydro2")
 
     # Pobierz i zapisz dane dla meteo
     dane_meteo = pobierz_dane(API_URLS["meteo"])
-    stacja_dane_meteo = filtruj_dane(dane_meteo, STATION_IDS["meteo"])
+    stacja_dane_meteo = filtruj_dane(dane_meteo, STATION_IDS["meteo"], "kod_stacji")
     zapisz_do_csv(stacja_dane_meteo, STATION_IDS["meteo"], "meteo")
 
 if __name__ == '__main__':
