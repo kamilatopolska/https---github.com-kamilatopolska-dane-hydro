@@ -28,7 +28,7 @@ def file_in_previous_month(filename):
         return False
 
 # Filtruj pliki dla każdego źródła
-files_to_aggregate_hydro1 = [os.path.join(folder, f) for f in csv_files if f.startswith('hydro1') and file_in_previous_month(f)]
+files_to_aggregate_hydro1 = [os.path.join(folder, f) for f in csv_files if (f.startswith('hydro1') or f.startswith('stacja')) and file_in_previous_month(f)]
 files_to_aggregate_hydro2 = [os.path.join(folder, f) for f in csv_files if f.startswith('hydro2') and file_in_previous_month(f)]
 files_to_aggregate_meteo = [os.path.join(folder, f) for f in csv_files if f.startswith('meteo') and file_in_previous_month(f)]
 
