@@ -18,19 +18,71 @@ jobs:
         run: |
           git fetch origin data-archive
           git checkout origin/data-archive -- data
-          git checkout origin/main -- aggregate.py
+          git checkout origin/main -- aggregate.py visualization.py
 
       - name: Sprawdzenie zawartości katalogu
         run: ls -R
 
-      - name: Zainstaluj pandas
-        run: pip install pandas
+      - name: Zainstaluj pandas i inne zależności
+        run: |
+          pip install pandas
+          pip install matplotlib seaborn numpy
 
       - name: Uruchom agregację danych
         run: python aggregate.py
 
-      - name: Upload zbiorczego pliku jako artefakt
+      - name: Przeniesienie CSV do folderu 'aggregated'
+        run: |
+          mkdir -p aggregated
+          mv aggregated/aggregated_hydro1_*.csv aggregated/ || echo "Brak plików CSV do przeniesienia"
+          mv aggregated/aggregated_hydro2_*.csv aggregated/ || echo "Brak plików CSV do przeniesienia"
+          mv aggregated/aggregated_meteo_*.csv aggregated/ || echo "Brak plików CSV do przeniesienia"
+
+      - name: Przeniesienie wykresów do folderu 'figures'
+        run: |
+          mkdir -p figures
+          mv figures/weather_data_*.png figures/ || echo "Brak plików wykresów do przeniesienia"
+
+      - name: Konfiguracja GIT
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Pobranie i przełączenie na gałąź 'data-archive'
+        run: |
+          # Pobranie wszystkich gałęzi
+          git fetch --all
+          
+          # Sprawdzenie, czy gałąź istnieje na GitHubie
+          if git show-ref --quiet refs/remotes/origin/data-archive; then
+            echo "Gałąź data-archive istnieje, przełączam się na nią."
+            git checkout data-archive
+          else
+            echo "Gałąź data-archive nie istnieje, tworzę nową."
+            git checkout -b data-archive
+            git push origin data-archive  # Utworzenie nowej gałęzi na GitHubie
+          fi
+
+      - name: Commit i push zmian do 'data-archive'
+        run: |
+          git add aggregated/ figures/
+          
+          if git diff --staged --quiet; then
+            echo "Brak nowych zmian do commitowania."
+            exit 0
+          fi
+          
+          git commit -m "Dodanie zbiorczych plików CSV i wykresów: $(date +'%Y-%m-%d %H:%M:%S')"
+          git push origin data-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload zbiorczych plików CSV i wykresów jako artefakt
         uses: actions/upload-artifact@v4
         with:
           name: aggregated-csv
-          path: aggregated_*.csv
+          path: aggregated/*.csv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: figures
+          path: figures/*.png

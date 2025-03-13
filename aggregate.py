@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from datetime import datetime
+import subprocess
 
 # Folder, w którym zapisywane są CSV
 folder = 'data'
@@ -46,6 +47,10 @@ def aggregate_files(files_to_aggregate, output_filename):
     print(f"Zbiorczy plik CSV zapisany jako {output_filename}")
 
 # Agreguj pliki dla każdego źródła
-aggregate_files(files_to_aggregate_hydro1, f'aggregated_hydro1_{year}_{month:02d}.csv')
-aggregate_files(files_to_aggregate_hydro2, f'aggregated_hydro2_{year}_{month:02d}.csv')
-aggregate_files(files_to_aggregate_meteo, f'aggregated_meteo_{year}_{month:02d}.csv')
+os.makedirs('aggregated', exist_ok=True)
+aggregate_files(files_to_aggregate_hydro1, f'aggregated/aggregated_hydro1_{year}_{month:02d}.csv')
+aggregate_files(files_to_aggregate_hydro2, f'aggregated/aggregated_hydro2_{year}_{month:02d}.csv')
+aggregate_files(files_to_aggregate_meteo, f'aggregated/aggregated_meteo_{year}_{month:02d}.csv')
+
+# Run the visualization script
+subprocess.run(["python", "visualization.py"], check=True)
