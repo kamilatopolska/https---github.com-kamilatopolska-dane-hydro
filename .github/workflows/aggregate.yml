@@ -30,6 +30,12 @@ jobs:
 
       - name: Uruchom agregację danych
         run: python aggregate.py
+        env:
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          RECIPIENT_EMAILS: ${{ secrets.RECIPIENT_EMAILS }}
 
       - name: Przeniesienie CSV do folderu 'aggregated'
         run: |
