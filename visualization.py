@@ -4,11 +4,19 @@ import seaborn as sns
 import os
 import numpy as np
 import matplotlib.dates as mdates
+from datetime import datetime
 
-# Load the aggregated data
-df_hydro1 = pd.read_csv('aggregated/aggregated_hydro1_2025_02.csv')
-df_hydro2 = pd.read_csv('aggregated/aggregated_hydro2_2025_02.csv')
-df_meteo = pd.read_csv('aggregated/aggregated_meteo_2025_02.csv')
+# Get the previous month's year and month
+today = datetime.today()
+first_day_this_month = datetime(today.year, today.month, 1)
+last_day_prev_month = first_day_this_month - pd.Timedelta(days=1)
+year = last_day_prev_month.year
+month = last_day_prev_month.month
+
+# Try to load the aggregated data with dynamic file names
+df_hydro1 = pd.read_csv(f'aggregated/aggregated_hydro1_{year}_{month:02d}.csv')
+df_hydro2 = pd.read_csv(f'aggregated/aggregated_hydro2_{year}_{month:02d}.csv')
+df_meteo = pd.read_csv(f'aggregated/aggregated_meteo_{year}_{month:02d}.csv')
 
 # Convert date columns to datetime
 df_hydro1['stan_wody_data_pomiaru'] = pd.to_datetime(df_hydro1['stan_wody_data_pomiaru'], errors='coerce')
@@ -72,10 +80,10 @@ ax4.set_ylabel('Temperatura (°C)', fontsize=13, color='orange')
 ax4.tick_params(axis='y', labelcolor='orange')
 ax4.tick_params(axis='y', labelsize=12)
 
-fig.suptitle('Dane pogodowe za luty 2025', fontsize=20, weight='bold')
+fig.suptitle(f'Dane pogodowe za {year}-{month:02d}', fontsize=20, weight='bold')
 fig.tight_layout(pad=3.08)
 fig.subplots_adjust(top=0.95, bottom=0.07)
 
 # Save the combined figure
-fig.savefig('figures/weather_data_february_2025.png')
+fig.savefig(f'figures/weather_data_{year}_{month:02d}.png')
 plt.close()
