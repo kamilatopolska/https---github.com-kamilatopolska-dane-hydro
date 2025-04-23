@@ -1,0 +1,2 @@
+kod_stacji,nazwa_stacji,lon,lat,temperatura_gruntu,temperatura_gruntu_data,wiatr_kierunek,wiatr_kierunek_data,wiatr_srednia_predkosc,wiatr_srednia_predkosc_data,wiatr_predkosc_maksymalna,wiatr_predkosc_maksymalna_data,wilgotnosc_wzgledna,wilgotnosc_wzgledna_data,wiatr_poryw_10min,wiatr_poryw_10min_data,opad_10min,opad_10min_data
+353140200,ŚWINOUJŚCIE,14.242222,53.923333,11.7,2025-04-23 05:50:00,340,2025-04-23 05:50:00,3.2,2025-04-23 05:50:00,3.6,2025-04-23 05:50:00,83.4,2025-04-23 05:50:00,,,0,2025-04-23 05:50:00
