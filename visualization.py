@@ -5,6 +5,15 @@ import os
 import numpy as np
 import matplotlib.dates as mdates
 from datetime import datetime
+import sys
+
+# Get location and sublocation from command line arguments
+if len(sys.argv) < 3:
+    print("Usage: python visualization.py <location> <sublocation>")
+    sys.exit(1)
+
+location = sys.argv[1]
+sublocation = sys.argv[2]
 
 # Get the previous month's year and month
 today = datetime.today()
@@ -13,10 +22,15 @@ last_day_prev_month = first_day_this_month - pd.Timedelta(days=1)
 year = last_day_prev_month.year
 month = last_day_prev_month.month
 
-# Try to load the aggregated data with dynamic file names
-df_hydro1 = pd.read_csv(f'aggregated/aggregated_hydro1_{year}_{month:02d}.csv')
-df_hydro2 = pd.read_csv(f'aggregated/aggregated_hydro2_{year}_{month:02d}.csv')
-df_meteo = pd.read_csv(f'aggregated/aggregated_meteo_{year}_{month:02d}.csv')
+# Update file paths to include sublocation
+base_filename = f'aggregated/aggregated_{location}_{sublocation}'
+try:
+    df_hydro1 = pd.read_csv(f'{base_filename}_hydro1_{year}_{month:02d}.csv')
+    df_hydro2 = pd.read_csv(f'{base_filename}_hydro2_{year}_{month:02d}.csv')
+    df_meteo = pd.read_csv(f'{base_filename}_meteo_{year}_{month:02d}.csv')
+except FileNotFoundError as e:
+    print(f"Some data files not found for {location}/{sublocation}. Skipping visualization.")
+    sys.exit(0)
 
 # Convert date columns to datetime
 df_hydro1['stan_wody_data_pomiaru'] = pd.to_datetime(df_hydro1['stan_wody_data_pomiaru'], errors='coerce')
@@ -26,6 +40,29 @@ df_meteo['opad_10min_data'] = pd.to_datetime(df_meteo['opad_10min_data'], errors
 
 # Create a folder for figures
 os.makedirs('figures', exist_ok=True)
+
+# Function to set x-axis properties for all plots
+def set_monthly_xaxis(ax, year, month):
+    # Get last day of the month
+    next_month = pd.Timestamp(year=year, month=month, day=1) + pd.DateOffset(months=1)
+    last_day = (next_month - pd.Timedelta(days=1)).day
+    
+    # Set x-axis limits to cover the full month
+    ax.set_xlim(
+        pd.Timestamp(year=year, month=month, day=1),
+        pd.Timestamp(year=year, month=month, day=last_day, hour=23, minute=59)
+    )
+    
+    # Set major ticks for each day
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d"))  # Show only day number
+    ax.tick_params(axis='x', rotation=45, labelsize=12)
+    
+    # If it's the bottom subplot, add month-year label
+    if ax.is_last_row():
+        ax.set_xlabel(f'Dni ({year}-{month:02d})', fontsize=13)
+    else:
+        ax.set_xlabel('')
 
 # Create a single figure with three subplots stacked vertically
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(16, 24))
@@ -80,10 +117,16 @@ ax4.set_ylabel('Temperatura (°C)', fontsize=13, color='orange')
 ax4.tick_params(axis='y', labelcolor='orange')
 ax4.tick_params(axis='y', labelsize=12)
 
-fig.suptitle(f'Dane pogodowe za {year}-{month:02d}', fontsize=20, weight='bold')
+# Apply x-axis settings to all plots
+set_monthly_xaxis(ax1, year, month)
+set_monthly_xaxis(ax2, year, month)
+set_monthly_xaxis(ax3, year, month)
+
+fig.suptitle(f'Dane pogodowe za {year}-{month:02d}\n{location.title()} - {sublocation.title()}', 
+            fontsize=20, weight='bold')
 fig.tight_layout(pad=3.08)
 fig.subplots_adjust(top=0.95, bottom=0.07)
 
-# Save the combined figure
-fig.savefig(f'figures/weather_data_{year}_{month:02d}.png')
+# Save the combined figure with location and sublocation in filename
+fig.savefig(f'figures/weather_data_{location}_{sublocation}_{year}_{month:02d}.png')
 plt.close()
