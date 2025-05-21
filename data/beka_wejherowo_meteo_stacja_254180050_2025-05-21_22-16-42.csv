@@ -1,0 +1,2 @@
+kod_stacji,nazwa_stacji,lon,lat,temperatura_gruntu,temperatura_gruntu_data,wiatr_kierunek,wiatr_kierunek_data,wiatr_srednia_predkosc,wiatr_srednia_predkosc_data,wiatr_predkosc_maksymalna,wiatr_predkosc_maksymalna_data,wilgotnosc_wzgledna,wilgotnosc_wzgledna_data,wiatr_poryw_10min,wiatr_poryw_10min_data,opad_10min,opad_10min_data
+254180050,WEJHEROWO,18.270278,54.598333,,,,,,,,,,,,,0,2025-05-21 21:50:00
