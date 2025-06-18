@@ -26,17 +26,14 @@ jobs:
       - name: Zainstaluj pandas i inne zależności
         run: |
           pip install pandas
-          pip install matplotlib seaborn numpy
-
+          pip install matplotlib seaborn numpy      
       - name: Uruchom agregację danych
         run: python aggregate.py
 
-      - name: Przeniesienie CSV do folderu 'aggregated'
-        run: |
-          mkdir -p aggregated
-          mv aggregated/aggregated_hydro1_*.csv aggregated/ || echo "Brak plików CSV do przeniesienia"
-          mv aggregated/aggregated_hydro2_*.csv aggregated/ || echo "Brak plików CSV do przeniesienia"
-          mv aggregated/aggregated_meteo_*.csv aggregated/ || echo "Brak plików CSV do przeniesienia"
+      - name: List files in aggregated directory
+        run: ls -la aggregated/
+
+      # No need to move files as they are already in the correct directory from aggregate.py
 
       - name: Przeniesienie wykresów do folderu 'figures'
         run: |
