@@ -1,0 +1,2 @@
+id_stacji,stacja,rzeka,wojewodztwo,lon,lat,stan_wody,stan_wody_data_pomiaru,temperatura_wody,temperatura_wody_data_pomiaru,przelyw,przeplyw_data,zjawisko_lodowe,zjawisko_lodowe_data_pomiaru,zjawisko_zarastania,zjawisko_zarastania_data_pomiaru
+153220100,Burzyn,Biebrza,podlaskie,22.4592,53.2742,134,2025-06-18 22:00:00,15.3,2025-05-23 06:00:00,8.88,2025-06-18 21:50:00,0,2025-03-27 10:10:00,0,2025-04-24 16:00:00
