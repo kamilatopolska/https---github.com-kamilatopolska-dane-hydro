@@ -26,16 +26,39 @@ jobs:
       - name: Zainstaluj pandas i inne zależności
         run: |
           pip install pandas
-          pip install matplotlib seaborn numpy        
-      - name: Uruchom agregację danych
-        run: python aggregate.py
+          pip install matplotlib seaborn numpy
 
-      - name: List generated files
+      - name: Create required directories
         run: |
-          echo "Aggregated CSV files:"
+          mkdir -p data aggregated figures
+          chmod 777 data aggregated figures
+          echo "Created directories with permissions:"
+          ls -la
+
+      - name: Sprawdź dane wejściowe
+        run: |
+          echo "Contents of data directory:"
+          ls -la data/
+          echo -e "\nChecking Python environment:"
+          python --version
+          pip list
+
+      - name: Uruchom agregację danych
+        run: |
+          echo "Running aggregation script..."
+          python -u aggregate.py  # -u for unbuffered output
+          
+          echo -e "\nChecking if files were created:"
+          echo "Aggregated directory contents:"
           ls -la aggregated/
-          echo -e "\nVisualization files:"
+          echo -e "\nFigures directory contents:"
           ls -la figures/
+          
+          if [ ! "$(ls -A aggregated/)" ]; then
+            echo "Warning: No files in aggregated directory!"
+            echo "Checking last month's data files:"
+            find data -type f -name "*.csv" -exec ls -la {} \;
+          fi
 
       # Files are already in their correct directories from aggregate.py and visualization.py
 
