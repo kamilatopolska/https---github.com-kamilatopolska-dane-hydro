@@ -52,17 +52,27 @@ def aggregate_files_for_location(location, sublocation):
         df_aggregated = pd.concat(df_list, ignore_index=True)
         df_aggregated.to_csv(output_filename, index=False)
         print(f"Zbiorczy plik CSV zapisany jako {output_filename}")
-        return True
-
-    # Agreguj pliki dla każdego źródła
+        return True    # Agreguj pliki dla każdego źródła
     base_filename = f'aggregated/aggregated_{location}_{sublocation}'
     files_created = []
+
+    # Check if this location/sublocation should have each type of data
+    station_config = {
+        'biebrza': {'mscichy': ['hydro1', 'hydro2', 'meteo'],
+                    'szorce': ['hydro1', 'hydro2', 'meteo'],
+                    'zajki': ['hydro1', 'hydro2', 'meteo']},
+        'beka': {'puck': ['hydro1', 'hydro2'],
+                'wejherowo': ['meteo']},
+        'swinoujscie': {'main': ['hydro1', 'hydro2', 'meteo']}
+    }
+
+    allowed_types = station_config.get(location, {}).get(sublocation, [])
     
-    if aggregate_files(files_to_aggregate_hydro1, f'{base_filename}_hydro1_{year}_{month:02d}.csv'):
+    if 'hydro1' in allowed_types and aggregate_files(files_to_aggregate_hydro1, f'{base_filename}_hydro1_{year}_{month:02d}.csv'):
         files_created.append('hydro1')
-    if aggregate_files(files_to_aggregate_hydro2, f'{base_filename}_hydro2_{year}_{month:02d}.csv'):
+    if 'hydro2' in allowed_types and aggregate_files(files_to_aggregate_hydro2, f'{base_filename}_hydro2_{year}_{month:02d}.csv'):
         files_created.append('hydro2')
-    if aggregate_files(files_to_aggregate_meteo, f'{base_filename}_meteo_{year}_{month:02d}.csv'):
+    if 'meteo' in allowed_types and aggregate_files(files_to_aggregate_meteo, f'{base_filename}_meteo_{year}_{month:02d}.csv'):
         files_created.append('meteo')
 
     if files_created:
