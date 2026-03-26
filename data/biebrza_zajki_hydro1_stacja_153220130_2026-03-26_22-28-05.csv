@@ -1,0 +1,2 @@
+id_stacji,stacja,rzeka,wojewodztwo,lon,lat,stan_wody,stan_wody_data_pomiaru,temperatura_wody,temperatura_wody_data_pomiaru,przelyw,przeplyw_data,zjawisko_lodowe,zjawisko_lodowe_data_pomiaru,zjawisko_zarastania,zjawisko_zarastania_data_pomiaru
+153220130,Strękowa Góra,Narew,podlaskie,22.5386,53.2197,174,2026-03-26 22:00:00,,,16.8,2026-02-18 09:50:00,0,2026-03-18 16:00:00,100,2025-11-19 12:40:00
