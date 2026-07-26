@@ -1,0 +1,2 @@
+id_stacji,stacja,rzeka,wojewodztwo,lon,lat,rok_zalozenia_stacji,rzedna_zerawodowskazu,kilometr_biegu_rzeki,stan_alarmowy,stan_ostrzegawczy,stan_wody,stan_wody_data_pomiaru,temperatura_wody,temperatura_wody_data_pomiaru,przeplyw,przeplyw_data,zjawisko_lodowe,zjawisko_lodowe_data_pomiaru,zjawisko_zarastania,zjawisko_zarastania_data_pomiaru
+153140010,Świnoujście,Zatoka Pomorska (ujście Świny),zachodniopomorskie,14.2644,53.9083,1810,-4.915,0,580,560,513,2026-07-26 14:30:00,19.8,2026-07-26 06:00:00,,,0,2026-03-06 12:00:00,,
